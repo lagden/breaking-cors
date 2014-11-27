@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+
+{% block title %}Break CORS{% endblock %}
+
+{% block content %}
+{% spaceless %}
+<h1>Breaking CORS</h1>
+<p>Use it only for testing API.</p>
+<h2>API</h2>
+<p><strong>POST</strong> <code>/call</code></p>
+<p><strong> Parameters</strong></p>
+<p><code>* required</code></p>
+<table>
+    <thead>
+        <tr>
+            <th> Name </th>
+            <th> Description </th>
+            <th> Default </th>
+            <th> Example </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td> url * </td>
+            <td> API url </td>
+            <td> - </td>
+            <td> http://randomuser.me/g/ </td>
+        </tr>
+        <tr>
+            <td> method </td>
+            <td> - </td>
+            <td> GET (GET or POST) </td>
+            <td> POST</td>
+        </tr>
+        <tr>
+            <td> data </td>
+            <td> Parameters </td>
+            <td> null </td>
+            <td>{"seed": "awesome"}</td>
+        </tr>
+        <tr>
+            <td> type </td>
+            <td> - </td>
+            <td> json (json or xml) </td>
+            <td> xml</td>
+        </tr>
+    </tbody>
+</table>
+<p><strong>Warning: </strong><code>data</code> must be a <strong>json</strong></p>
+<h2>Usage</h2>
+<p>Some examples:</p>
+<h3>curl</h3>
+<pre><code>curl -X POST http://cors.lagden.in/call -i -d "url=http://randomuser.me/g/&amp;method=POST&amp;data={\\"seed\\":\\"awesome\\"}"</code></pre>
+<h3>javascript</h3>
+{% endspaceless %}
+<pre><code>var formData,
+    xhr,
+    listener;
+
+listener = function() {
+    console.log(xhr.responseText);
+};
+
+formData = new FormData();
+formData.append('url', 'http://randomuser.me/g/');
+formData.append('data', '{"seed": "awesome"}');
+
+xhr = new XMLHttpRequest();
+xhr.onload = listener;
+xhr.open('POST', 'http://cors.lagden.in/call');
+xhr.send(formData);
+</code></pre>
+
+<h4>Example</h4>
+<p>Open <code>console</code> and <b id="callAjax" style="cursor: pointer;">click here</b>.</p>
+<script>
+    var ajax;
+
+    function execute() {
+
+        console.log('running...');
+
+        var formData,
+            xhr,
+            listener;
+
+        listener = function() {
+            console.log(JSON.parse(xhr.responseText));
+        };
+
+        formData = new FormData();
+        formData.append('url', 'http://randomuser.me/g/');
+        formData.append('data', '{"seed": "awesome"}');
+
+        xhr = new XMLHttpRequest();
+        xhr.onload = listener;
+        xhr.open('POST', 'http://cors.lagden.in/call');
+        xhr.send(formData);
+    }
+
+    ajax = document.querySelector('#callAjax');
+    ajax.addEventListener('click', execute.bind(), false);
+
+</script>
+{%- endblock -%}
