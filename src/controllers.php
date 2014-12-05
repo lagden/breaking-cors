@@ -9,7 +9,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 // Request::setTrustedProxies(['127.0.0.1']);
 
 $app->after(function (Request $request, Response $response) {
-    $response = new Response();
     $response->headers->set('Access-Control-Allow-Origin', '*');
 });
 

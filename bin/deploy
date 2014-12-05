@@ -20,6 +20,8 @@ cd /home/lagden/projects/cors/.
 composer.phar self-update
 composer.phar update
 
+rm -rf /home/lagden/projects/cors/var/cache
+
 exit 0
 EOF
 
