@@ -4,7 +4,7 @@ Use it only for testing API.
 
 ## API
 
-**POST** `/call`
+**GET | POST | PUT** `/call`
 
 **Parameters**
 
@@ -27,26 +27,26 @@ Some examples:
 ### curl
 
     curl -X POST http://cors.lagden.in/call -i -d "url=http://randomuser.me/g/&method=POST&data={\"seed\":\"awesome\"}"
-    
+
 ### javascript
 
     var formData,
         xhr,
         listener;
-    
+
     listener = function() {
         console.log(xhr.responseText);
     };
-    
+
     formData = new FormData();
     formData.append('url', 'http://randomuser.me/g/');
     formData.append('data', '{"seed": "awesome"}');
-    
+
     xhr = new XMLHttpRequest();
     xhr.onload = listener;
     xhr.open('POST', 'http://cors.lagden.in/call');
     xhr.send(formData);
-    
+
 ## Contributors
 
 - [Thiago Lagden](http://lagden.in)

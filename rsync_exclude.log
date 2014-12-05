@@ -1,5 +1,4 @@
 building file list ... done
-cannot delete non-empty directory: var/cache
 composer.json
 bin/console
 config/dev.php
@@ -20,5 +19,5 @@ web/index_dev.php
 web/npm-debug.log
 web/css/app.css
 
-sent 2795 bytes  received 1038 bytes  851.78 bytes/sec
-total size is 62194  speedup is 16.23
+sent 2799 bytes  received 1038 bytes  852.67 bytes/sec
+total size is 62173  speedup is 16.20
