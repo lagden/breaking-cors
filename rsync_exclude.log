@@ -1,0 +1,23 @@
+building file list ... done
+composer.json
+bin/console
+config/dev.php
+config/prod.php
+src/app.php
+src/console.php
+src/controllers.php
+templates/index.html
+templates/layout.html
+templates/errors/404.html
+templates/errors/4xx.html
+templates/errors/500.html
+templates/errors/5xx.html
+templates/errors/default.html
+web/.htaccess
+web/index.php
+web/index_dev.php
+web/npm-debug.log
+web/css/app.css
+
+sent 40924 bytes  received 972 bytes  9310.22 bytes/sec
+total size is 61878  speedup is 1.48

@@ -1,0 +1,26 @@
+# Project files
+.svn*
+.git*
+.jsh*
+.bower*
+.edito*
+*.md
+*.sublime-*
+/composer.lock
+/rsync_exclude.*
+/bin/deploy
+/var/cache/*
+/var/logs/*
+/vendor
+/LICENSE
+/phpunit.*
+
+# SCM files
+.DS_Store
+thumbs.db
+.arch-params
+.bzr
+_darcs
+.hg
+.monotone
+CVS
