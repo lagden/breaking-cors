@@ -9,89 +9,94 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 // Request::setTrustedProxies(['127.0.0.1']);
 
 $app->after(function (Request $request, Response $response) {
-    $response->headers->set('Access-Control-Allow-Origin', '*');
+	$response->headers->set('Access-Control-Allow-Origin','*');
+	$response->headers->set('Access-Control-Allow-Methods','GET,POST,PUT,DELETE,OPTIONS');
+	$response->headers->set('Access-Control-Allow-Headers','Content-Type');
 });
 
 $app->get('/', function () use ($app) {
-    return $app['twig']->render('index.html', []);
+	return $app['twig']->render('index.html', []);
 })
 ->bind('homepage');
 
 $app->match('/call', function (Request $request) use ($app) {
-    $post = [];
-    $params =['url', 'method', 'data', 'type'];
-    foreach ($params as $param)
-        $post[$param] = $request->get($param, null);
+	$post = [];
+	$params =['url', 'method', 'data', 'type'];
+	foreach ($params as $param)
+		$post[$param] = $request->get($param, null);
 
-    $method = $post['method'] ? $post['method'] : 'GET';
-    $type = $post['type'] ? $post['type'] : 'json';
+	$method = $post['method'] ? $post['method'] : 'GET';
+	$type = $post['type'] ? $post['type'] : 'json';
 
-    return Cors::resposta($post['url'], $method, $post['data'], $type);
+	$res = Cors::resposta($post['url'], $method, $post['data'], $type);
+	if ($type) {
+		return new Response($res, 200, ['Content-Type' => 'application/json']);
+	} else {
+		return $res;
+	}
 })
 ->method('PUT|POST|GET')
 ->bind('cors');
 
 $app->error(function (\Exception $e, $code) use ($app) {
-    if ($app['debug'])
-        return;
+	if ($app['debug'])
+		return;
 
-    // 404.html, or 40x.html, or 4xx.html, or error.html
-    $templates = [
-        'errors/'.$code.'.html',
-        'errors/'.substr($code, 0, 2).'x.html',
-        'errors/'.substr($code, 0, 1).'xx.html',
-        'errors/default.html',
-    ];
+	// 404.html, or 40x.html, or 4xx.html, or error.html
+	$templates = [
+		'errors/'.$code.'.html',
+		'errors/'.substr($code, 0, 2).'x.html',
+		'errors/'.substr($code, 0, 1).'xx.html',
+		'errors/default.html',
+	];
 
-    return new Response($app['twig']->resolveTemplate($templates)->render(['code' => $code]), $code);
+	return new Response($app['twig']->resolveTemplate($templates)->render(['code' => $code]), $code);
 });
 
 class Cors
 {
-    static private function build($data = null)
-    {
-        if($data)
-            $data = json_decode($data, true);
+	static private function build($data = null)
+	{
+		if($data)
+			$data = json_decode($data, true);
 
-        return $data;
-    }
+		return $data;
+	}
 
-    static public function resposta($url, $method, $data = null, $type = "json")
-    {
-        $header = [
-            "Accept: application/{$type}",
-            "Accept-Encoding: gzip, deflate, sdch",
-            "Accept-language: en-US",
-            "Cache-Control: no-cache",
-            "User-Agent:Lagden.in/1.0"
-        ];
+	static public function resposta($url, $method, $data = null, $type = "json")
+	{
+		$header = [
+			"Accept: application/{$type}",
+			"Accept-Encoding: gzip, deflate, sdch",
+			"Accept-language: en-US",
+			"Cache-Control: no-cache",
+			"User-Agent:Lagden.in/1.0"
+		];
 
-        $opts = [
-            'http' => [
-                'method' => $method
-            ]
-        ];
+		$opts = [
+			'http' => [
+			'method' => $method
+			]
+		];
 
-        $sendData = static::build($data);
-        if($sendData)
-        {
-            $data_url = http_build_query ($sendData);
-            $data_len = strlen ($data_url);
-            if($method == 'GET')
-                $url = "{$url}?{$data_url}";
-            else
-            {
-                $opts['http']['content'] = $data_url;
-                array_push($header, "Content-type: application/x-www-form-urlencoded");
-                array_push($header, "Content-Length: {$data_len}");
-            }
-        }
+		$sendData = static::build($data);
+		if ($sendData) {
+			$data_url = http_build_query ($sendData);
+			$data_len = strlen ($data_url);
+			if($method == 'GET')
+				$url = "{$url}?{$data_url}";
+			else
+			{
+				$opts['http']['content'] = $data_url;
+				array_push($header, "Content-type: application/x-www-form-urlencoded");
+				array_push($header, "Content-Length: {$data_len}");
+			}
+		}
 
-        $opts['http']['header'] = implode($header, "\r\n");
+		$opts['http']['header'] = implode($header, "\r\n");
+		$context = stream_context_create($opts);
+		$response = file_get_contents($url, false, $context);
 
-        $context = stream_context_create($opts);
-        $response = file_get_contents($url, false, $context, -1, 40000);
-
-        return $response;
-    }
+		return $response;
+	}
 }

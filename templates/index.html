@@ -89,8 +89,7 @@ xhr.send(formData);
         };
 
         formData = new FormData();
-        formData.append('url', 'http://randomuser.me/g/');
-        formData.append('data', '{"seed": "awesome"}');
+        formData.append('url', 'http://code.highcharts.com/mapdata/custom/africa.geo.json');
 
         xhr = new XMLHttpRequest();
         xhr.onload = listener;
