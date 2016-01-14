@@ -2,3 +2,4 @@
 /var/logs/*
 /vendor/
 composer.lock
+rsync_exclude.log
