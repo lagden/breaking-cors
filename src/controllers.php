@@ -11,7 +11,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 $app->after(function (Request $request, Response $response) {
 	$response->headers->set('Access-Control-Allow-Origin','*');
 	$response->headers->set('Access-Control-Allow-Methods','GET,POST,PUT,DELETE,OPTIONS');
-	$response->headers->set('Access-Control-Allow-Headers','Content-Type');
+	$response->headers->set('Access-Control-Allow-Headers','X-Lagden-Req');
+	$response->headers->set('Access-Control-Allow-Credentials','true');
 });
 
 $app->get('/', function () use ($app) {
@@ -21,26 +22,28 @@ $app->get('/', function () use ($app) {
 
 $app->match('/call', function (Request $request) use ($app) {
 	$post = [];
-	$params =['url', 'method', 'data', 'type'];
-	foreach ($params as $param)
+	$params =['url', 'method', 'data', 'headers', 'type'];
+	foreach ($params as $param) {
 		$post[$param] = $request->get($param, null);
+	}
 
 	$method = $post['method'] ? $post['method'] : 'GET';
-	$type = $post['type'] ? $post['type'] : 'json';
+	$headers = $post['headers'] ? json_decode($post['headers'], true) : [];
 
-	$res = Cors::resposta($post['url'], $method, $post['data'], $type);
-	if ($type) {
-		return new Response($res, 200, ['Content-Type' => 'application/json']);
+	$res = Cors::resposta($post['url'], $method, $post['type'], $post['data'], $headers);
+	if ($post['type']) {
+		return new Response($res, 200, ['Content-Type' => $post['type']]);
 	} else {
 		return $res;
 	}
 })
-->method('PUT|POST|GET')
+->method('PUT|POST|GET|HEAD|PATCH|OPTIONS')
 ->bind('cors');
 
 $app->error(function (\Exception $e, $code) use ($app) {
-	if ($app['debug'])
+	if ($app['debug']) {
 		return;
+	}
 
 	// 404.html, or 40x.html, or 4xx.html, or error.html
 	$templates = [
@@ -53,25 +56,23 @@ $app->error(function (\Exception $e, $code) use ($app) {
 	return new Response($app['twig']->resolveTemplate($templates)->render(['code' => $code]), $code);
 });
 
-class Cors
-{
-	static private function build($data = null)
-	{
-		if($data)
+class Cors {
+	static private function build($data = null) {
+		if($data) {
 			$data = json_decode($data, true);
-
+		}
 		return $data;
 	}
 
-	static public function resposta($url, $method, $data = null, $type = "json")
-	{
-		$header = [
-			"Accept: application/{$type}",
+	static public function resposta($url, $method, $type, $data = null, $headers = []) {
+		$defaultHeader = [
+			"Accept: {$type}",
 			"Accept-Encoding: gzip, deflate, sdch",
 			"Accept-language: en-US",
 			"Cache-Control: no-cache",
-			"User-Agent:Lagden.in/1.0"
+			"User-Agent: Lagden.in/1.0"
 		];
+		$header = array_merge($defaultHeader, $headers);
 
 		$opts = [
 			'http' => [
@@ -83,10 +84,9 @@ class Cors
 		if ($sendData) {
 			$data_url = http_build_query ($sendData);
 			$data_len = strlen ($data_url);
-			if($method == 'GET')
+			if($method == 'GET') {
 				$url = "{$url}?{$data_url}";
-			else
-			{
+			} else {
 				$opts['http']['content'] = $data_url;
 				array_push($header, "Content-type: application/x-www-form-urlencoded");
 				array_push($header, "Content-Length: {$data_len}");

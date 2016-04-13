@@ -90,6 +90,9 @@ xhr.send(formData);
 
         formData = new FormData();
         formData.append('url', 'http://code.highcharts.com/mapdata/custom/africa.geo.json');
+        formData.append('method', 'GET');
+        formData.append('headers', JSON.stringify(['X-Lagden-Req: ulalaa']));
+        formData.append('type', 'application/json');
 
         xhr = new XMLHttpRequest();
         xhr.onload = listener;
